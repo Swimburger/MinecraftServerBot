@@ -3,6 +3,7 @@ using Azure;
 using Azure.ResourceManager;
 using Azure.ResourceManager.Compute;
 using Azure.ResourceManager.Compute.Models;
+using Azure.ResourceManager.Network;
 using Azure.ResourceManager.Resources;
 
 namespace MinecraftServerBot;
@@ -68,5 +69,19 @@ public class MinecraftServer
         SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
         ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(resourceGroupName);
         return await resourceGroup.GetVirtualMachineAsync(virtualMachineName);
+    }
+
+    public async Task<(string Ip, string Domain)> GetConnectionInformation()
+    {
+        SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(resourceGroupName);
+        VirtualMachineResource virtualMachine = await resourceGroup.GetVirtualMachineAsync(virtualMachineName);
+
+        var networkInterfaceId = virtualMachine.Data.NetworkProfile.NetworkInterfaces.Single().Id;
+        NetworkInterfaceResource networkInterface = await resourceGroup.GetNetworkInterfaceAsync(networkInterfaceId.Name);
+        var publicIpId = networkInterface.Data.IPConfigurations.Single().PublicIPAddress.Id;
+        PublicIPAddressResource publicIp = await resourceGroup.GetPublicIPAddressAsync(publicIpId.Name);
+
+        return (publicIp.Data.IPAddress, publicIp.Data.DnsSettings.Fqdn);
     }
 }

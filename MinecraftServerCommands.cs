@@ -37,7 +37,7 @@ public class MinecraftServerCommands : ApplicationCommandModule
         );
     }
 
-    
+
 
     [SlashCommand("restart", "Restarts the server")]
     public async Task Restart(InteractionContext context)
@@ -54,7 +54,7 @@ public class MinecraftServerCommands : ApplicationCommandModule
         );
     }
 
-    
+
 
     [SlashCommand("stop", "Stops the server")]
     public async Task Stop(InteractionContext context)
@@ -78,6 +78,16 @@ public class MinecraftServerCommands : ApplicationCommandModule
         await context.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new()
         {
             Content = $"Server status is {status}"
+        });
+    }
+
+    [SlashCommand("connection-info", "Get IP and DNS for server")]
+    public async Task GetConnectionInformation(InteractionContext context)
+    {
+        var (ip, domain) = await minecraftServer.GetConnectionInformation();
+        await context.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new()
+        {
+            Content = $"Server IP: {ip}, domain: {domain}"
         });
     }
 }
