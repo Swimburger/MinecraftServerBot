@@ -1,5 +1,3 @@
-using Azure.ResourceManager.Compute;
-using Azure.ResourceManager.Resources;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 
@@ -24,7 +22,7 @@ public class MinecraftBotService : BackgroundService
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        discordClient.MessageCreated += OnMessageCreated;
+        //discordClient.MessageCreated += OnMessageCreated;
         await discordClient.ConnectAsync();
     }
 
@@ -79,7 +77,7 @@ public class MinecraftBotService : BackgroundService
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        discordClient.MessageCreated -= OnMessageCreated;
+        //discordClient.MessageCreated -= OnMessageCreated;
         await discordClient.DisconnectAsync();
         discordClient.Dispose();
     }

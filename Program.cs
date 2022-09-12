@@ -2,6 +2,7 @@ using Azure.Identity;
 using DSharpPlus;
 using MinecraftServerBot;
 using Azure.ResourceManager;
+using DSharpPlus.SlashCommands;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((builder, services) =>
@@ -23,12 +24,24 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddTransient<MinecraftServer>();
 
-        services.AddSingleton<DiscordClient>(serviceProvider => new DiscordClient(new DiscordConfiguration
+        services.AddSingleton<DiscordClient>(serviceProvider =>
         {
-            Token = builder.Configuration["DiscordBot:Token"],
-            TokenType = TokenType.Bot,
-            Intents = DiscordIntents.AllUnprivileged
-        }));
+            var discordClient = new DiscordClient(new DiscordConfiguration
+            {
+                Token = builder.Configuration["DiscordBot:Token"],
+                TokenType = TokenType.Bot,
+                Intents = DiscordIntents.AllUnprivileged
+            });
+
+            var slash = discordClient.UseSlashCommands(new SlashCommandsConfiguration
+            {
+                Services = serviceProvider
+            });
+            
+            slash.RegisterCommands<MinecraftServerCommands>();
+
+            return discordClient;
+        });
 
         services.AddHostedService<MinecraftBotService>();
     })
