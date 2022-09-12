@@ -18,3 +18,5 @@ dotnet add package Azure.ResourceManager.Compute
 
 # create service principal, 
 az ad sp create-for-rbac --name minecraft_developer
+
+# give principal permission to read resource group and manage VM
