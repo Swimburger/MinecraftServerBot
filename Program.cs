@@ -9,7 +9,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         var configuration = builder.Configuration;
 
-        if (builder.HostingEnvironment.IsDevelopment())
+                if (builder.HostingEnvironment.IsDevelopment())
         {
             services.AddTransient<ArmClient>(_ => new ArmClient(new ClientSecretCredential(
                 tenantId: configuration["Azure:TenantId"],
@@ -26,6 +26,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddSingleton<DiscordClient>(serviceProvider =>
         {
+            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
             var discordClient = new DiscordClient(new DiscordConfiguration
             {
                 Token = builder.Configuration["DiscordBot:Token"],
@@ -38,6 +39,12 @@ IHost host = Host.CreateDefaultBuilder(args)
                 Services = serviceProvider
             });
             
+            slash.SlashCommandErrored += (s, e) =>
+            {
+                logger.LogError(e.Exception, e.Exception.Message);
+                return Task.CompletedTask;
+            };
+
             slash.RegisterCommands<MinecraftServerCommands>();
 
             return discordClient;
